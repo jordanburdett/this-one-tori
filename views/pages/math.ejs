@@ -15,9 +15,40 @@
       </div>
   </div>
 
+  <div class="container">
+    <form method="post">
+      <div class="form-row align-items-center">
+        <input id="num1" name="num1" type=number class="form-control" autofocus required>
+        <select id="operator" name="operator" class="form-control" required>
+          <option value="+">+</option>
+          <option value="-">-</option>
+          <option value="*">x</option>
+          <option value="/">/</option>
+        </select>
+        <input id="num2" name="num2" type=number class="form-control" required>
+        <button type="button" class="btn btn-success btn-lrg" onclick="calculate()">Calculate</button>
+      </div>
+    </form>
+    <div id="result"></div>
+  </div>
+
 
 
   <% include ../partials/footer.ejs %>
+
+  <script>
+    function calculate() {
+      $('#result').load('/domath', {
+        num1 : $('#num1').val(),
+        num2 : $('#num2').val(),
+        operator : $('#operator').val()
+      }, function(err, stat, someother) {
+        console.log("done mathing");
+      });
+
+    }
+  </script>
 </body>
+
 
 </html>
