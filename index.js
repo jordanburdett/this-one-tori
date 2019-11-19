@@ -40,6 +40,10 @@ express()
       // Log this to the console for debugging purposes.
       console.log("Back from DB with result:");
       console.log(result.rows);
+
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.write("<div class='display-4'>Response from database " + result.rows + "</div>");
+      res.end();
     }
   )})
   .get('/math', (req, res) => res.render('pages/math'))
