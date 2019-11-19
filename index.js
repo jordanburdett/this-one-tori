@@ -1,10 +1,12 @@
 const express = require('express')
 const path = require('path')
 var fs = require('fs')
-const { Pool } = require('pg')
 const PORT = process.env.PORT || 5000
 const connectionString = process.env.DATABASE_URL || "postgres://rwomixvqbgubak:8b23aeaeda698af90a27e3a3d059edc4b3c7325c125705339b722caf7ba15e7d@ec2-54-83-61-142.compute-1.amazonaws.com:5432/d5nbldkuhdg9ue?ssl=true";
-const pool = new Pool({connectionString: connectionString});
+console.log("using connection string " + connectionString);
+const { Pool } = require('pg')
+const pool = new Pool({connectionString: connectionString, sslmode: 'require'});
+
 express()
   .use(express.urlencoded())
   .use(express.static(path.join(__dirname, 'public')))
@@ -43,6 +45,7 @@ express()
 
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.write("<div class='display-4'>Response from database " + JSON.stringify(result.rows) + "</div>");
+      res.write(connectionString);
       res.end();
     }
   )})
