@@ -42,7 +42,7 @@ express()
       console.log(result.rows);
 
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.write("<div class='display-4'>Response from database " + result.rows + "</div>");
+      res.write("<div class='display-4'>Response from database " + JSON.stringify(result.rows) + "</div>");
       res.end();
     }
   )})
