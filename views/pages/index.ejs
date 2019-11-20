@@ -13,21 +13,27 @@
         <div class="jumbotron">
             <div class="display-4" style="text-align:center;">Index</div>
         </div>
+
+        <input type="number" class="form-control" id="id" name="id" required>
+        <button onclick="getPersons()" class="btn btn-primary">FindPerson</button>
+
+        <div id="personResponse"></div>
     </div>
 
-    <div class="container">
-        <h1>Pages</h1>
-        
-            <%= 
-            files
-            //files.forEach(function(file) {  %>
-            <p><%= //file %></p>
-            <%= //}) %>
-        
-
-    </div>
+   
 
     <% include ../partials/footer.ejs %>
+
+
+
+    <script>
+        function getPersons() {
+            $.post("/findPerson", {id: document.getElementById("id").value}, function(data, status) {
+                console.log(data[0]);
+                document.getElementById("personResponse").innerHTML = JSON.stringify(data[0]);
+            })
+        }   
+    </script>
 </body>
 
 </html>

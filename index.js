@@ -1,6 +1,7 @@
 const express = require('express')
 const path = require('path')
 var fs = require('fs')
+
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const PORT = process.env.PORT || 5000
 const connectionString = process.env.DATABASE_URL || "postgres://rwomixvqbgubak:8b23aeaeda698af90a27e3a3d059edc4b3c7325c125705339b722caf7ba15e7d@ec2-54-83-61-142.compute-1.amazonaws.com:5432/d5nbldkuhdg9ue?ssl=true";
@@ -30,9 +31,9 @@ express()
     })
    // https://github.com/jordanburdett/this-one-tori
   })
-  .get('/query', function (req, res) {
-
-    var sql = "SELECT * FROM scriptures";
+  .post('/findPerson', function (req, res) {
+    var id = req.body.id;
+    var sql = "SELECT * FROM person WHERE id = " + id;
     pool.query(sql, function (err, result) {
 
       // If an error occurred...
@@ -45,11 +46,19 @@ express()
       console.log("Back from DB with result:");
       console.log(result.rows);
 
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.write("<div class='display-4'>Response from database " + JSON.stringify(result.rows) + "</div>");
-      res.end();
+      res.json(result.rows);
     }
   )})
+  .get('/getPerson', function (req, res) {
+    if (err) console.log(err);
+
+    var id = req.body.id;
+    var sql = "SELECT * FROM person WHERE id = " + id;
+    pool.query(sql, function (err, res) {
+      if (err) console.log(err);
+      console.log(res.json(results.row));
+    })
+  })
   .get('/math', (req, res) => res.render('pages/math'))
   .get('/db', (req, res) => res.render('pages/db'))
   .post('/domath', function (req, res, next) {
