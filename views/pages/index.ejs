@@ -19,8 +19,18 @@
 
         <div id="personResponse"></div>
     </div>
+    <br>
+    <div class="container">
+        <div class="jumbotron">
+            <label>Movie</label>
+            <input type="text" class="form-control" id="movieId" name="movieId" required>
+            <br>
+            <button onclick="getMovieDetails()" class="btn btn-secondary">Search Movie</button>
+            <div id="movieResults"></div>
+        </div>
+    </div>
 
-   
+
 
     <% include ../partials/footer.ejs %>
 
@@ -28,11 +38,29 @@
 
     <script>
         function getPersons() {
-            $.post("/findPerson", {id: document.getElementById("id").value}, function(data, status) {
+            $.post("/findPerson", { id: document.getElementById("id").value }, function (data, status) {
                 console.log(data[0]);
                 document.getElementById("personResponse").innerHTML = JSON.stringify(data[0]);
             })
-        }   
+        }
+
+        async function getMovieDetails() {
+            const response = await fetch('http://www.omdbapi.com/?apikey=3118e725&plot=full&t=' + document.getElementById('movieId').value);
+            const movie = await response.json();
+
+            if (movie['Error']) {
+                console.log(movie['Error'])
+            }
+            else {
+                //console.log(JSON.stringify(movie))
+                console.log(movie['Plot']);
+                document.getElementById('movieResults').innerHTML = "<h1>" + movie['Title'] + "</h1>"
+                 + "<p>" + movie['Plot'] + "</p>"
+                 + "<img src='" + movie['Poster'] + "' alt='poster' class='img-thumbnail'>"
+
+            }
+
+        }
     </script>
 </body>
 
