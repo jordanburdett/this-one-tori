@@ -26,7 +26,7 @@
             <input type="text" class="form-control" id="movieId" name="movieId" required>
             <br>
             <button onclick="getMovieDetails()" class="btn btn-secondary">Search Movie</button>
-            <div id="movieResults"></div>
+            <div id="movieResults"> </div>
         </div>
     </div>
 
@@ -37,6 +37,9 @@
 
 
     <script>
+        var movies = [];
+        var num = 0;
+
         function getPersons() {
             $.post("/findPerson", { id: document.getElementById("id").value }, function (data, status) {
                 console.log(data[0]);
@@ -54,12 +57,27 @@
             else {
                 //console.log(JSON.stringify(movie))
                 console.log(movie['Plot']);
-                document.getElementById('movieResults').innerHTML = "<h1>" + movie['Title'] + "</h1>"
+                let text = JSON.stringify(movie);
+                movies.push(movie);
+                $('#movieResults').prepend("<br><div id = 'mov"+ num + "list'>" + movie['Title']
+                 + "<button onclick='showInfo("+ num + ")'class='btn btn-secondary float-right'>Show Details</button></div>"
+                 + "<div id='mov" + num + "info' style='display: none; position: relative'><h1>" + movie['Title'] + "</h1>"
+                 + "<button onclick='hideInfo("+ num + ")'class='btn btn-secondary' style='position: absolute; top:0; right:0'>Hide Details</button>"
                  + "<p>" + movie['Plot'] + "</p>"
-                 + "<img src='" + movie['Poster'] + "' alt='poster' class='img-thumbnail'>"
-
+                 + "<img src='" + movie['Poster'] + "' alt='poster' class='img-thumbnail'></div>");
+                 num += 1;
             }
 
+        }
+        function showInfo(index) {
+            console.log(movies[index]);
+            $('#mov' + index + 'list').css('display', 'none');
+            $('#mov' + index + 'info').css('display', 'block');
+        }
+        function hideInfo(index) {
+            console.log(movies[index]);
+            $('#mov' + index + 'list').css('display', 'block');
+            $('#mov' + index + 'info').css('display', 'none');
         }
     </script>
 </body>
