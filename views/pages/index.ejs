@@ -30,6 +30,24 @@
         </div>
     </div>
 
+    <div>
+        <form id="login" class="my-3" method="POST" action="/login">
+            <div class="form-group">
+                <label class="h5" for="email">Email</label>
+                <input class="form-control form-control-lg" type="email" id="email" name="email"
+                    placeholder="email@example.com" maxlength="30" required autofocus>
+                <div id="badEmail" class="invalid-feedback"></div>
+            </div>
+            <div class="form-group">
+                <labe class="h5" for="password">Password</labe>
+                <input class="form-control form-control-lg" type="password" id="password" name="password"
+                    placeholder="Pa$$word" required>
+                <div id="badPass" class="invalid-feedback"></div>
+            </div>
+            <button type="button" class="btn btn-success btn-lg">Login</button>
+        </form>
+    </div>
+
 
 
     <% include ../partials/footer.ejs %>
@@ -59,13 +77,13 @@
                 console.log(movie['Plot']);
                 let text = JSON.stringify(movie);
                 movies.push(movie);
-                $('#movieResults').prepend("<br><div id = 'mov"+ num + "list'>" + movie['Title']
-                 + "<button onclick='showInfo("+ num + ")'class='btn btn-secondary float-right'>Show Details</button></div>"
-                 + "<div id='mov" + num + "info' style='display: none; position: relative'><h1>" + movie['Title'] + "</h1>"
-                 + "<button onclick='hideInfo("+ num + ")'class='btn btn-secondary' style='position: absolute; top:0; right:0'>Hide Details</button>"
-                 + "<p>" + movie['Plot'] + "</p>"
-                 + "<img src='" + movie['Poster'] + "' alt='poster' class='img-thumbnail'></div>");
-                 num += 1;
+                $('#movieResults').prepend("<br><div id = 'mov" + num + "list'>" + movie['Title']
+                    + "<button onclick='showInfo(" + num + ")'class='btn btn-secondary float-right'>Show Details</button></div>"
+                    + "<div id='mov" + num + "info' style='display: none; position: relative'><h1>" + movie['Title'] + "</h1>"
+                    + "<button onclick='hideInfo(" + num + ")'class='btn btn-secondary' style='position: absolute; top:0; right:0'>Hide Details</button>"
+                    + "<p>" + movie['Plot'] + "</p>"
+                    + "<img src='" + movie['Poster'] + "' alt='poster' class='img-thumbnail'></div>");
+                num += 1;
             }
 
         }
