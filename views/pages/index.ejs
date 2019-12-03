@@ -9,6 +9,7 @@
 
     <% include ../partials/nav.ejs %>
 
+
     <div class="container">
         <div class="jumbotron">
             <div class="display-4" style="text-align:center;">Index</div>
@@ -20,6 +21,19 @@
         <div id="personResponse"></div>
     </div>
     <br>
+
+    <div class="container">
+        <div>
+            <input type="text" id="username" placeholder="username"><br>
+            <input type="password" id="password" placeholder="password"><br>
+            <button onclick="login();">Log in</button>
+            <button onclick="logout();">Log out</button><br>
+            <br>
+            <button onclick="getServerTime()">Get server time</button>
+            <div id="status"></div>
+        </div>
+    </div>
+    <br><br>
     <div class="container">
         <div class="jumbotron">
             <label>Movie</label>
@@ -30,25 +44,6 @@
         </div>
     </div>
 
-    <div class="container">
-        <form id="login" class="my-3" method="POST" action="/login">
-            <div class="form-group">
-                <label class="h5" for="email">Email</label>
-                <input class="form-control form-control-lg" type="email" id="email" name="email"
-                    placeholder="email@example.com" maxlength="30" required autofocus>
-                <div id="badEmail" class="invalid-feedback"></div>
-            </div>
-            <div class="form-group">
-                <labe class="h5" for="password">Password</labe>
-                <input class="form-control form-control-lg" type="password" id="password" name="password"
-                    placeholder="Pa$$word" required>
-                <div id="badPass" class="invalid-feedback"></div>
-            </div>
-            <button type="submit" class="btn btn-success btn-lg">Login</button>
-        </form>
-    </div>
-
-
 
     <% include ../partials/footer.ejs %>
 
@@ -57,6 +52,47 @@
     <script>
         var movies = [];
         var num = 0;
+
+        function login() {
+            var username = $("#username").val();
+            var password = $("#password").val();
+
+            var params = {
+                username: username,
+                password: password
+            };
+
+            $.post("/login", params, function(result) {
+                if (result && result.success) {
+                    $("#status").text("Successfully logged in.");
+                } else {
+                    $("#status").text("Error logging in.");
+                }
+            });
+        }
+
+        function logout() {
+            $.post("/logout", function(result) {
+                if (result && result.success) {
+                    $("#status").text("Successfully logged out.");
+                } else {
+                    $("#status").text("Error logging out.");
+                }
+            });
+        }
+
+        function getServerTime() {
+            $.get("/getServerTime", function(result) {
+                if (result && result.success) {
+                    $("#status").text("Server time: " + result.time);
+                } else {
+                    $("#status").text("Got a result back, but it wasn't a success. Your reponse should have had a 401 status code.");
+                }
+            }).fail(function(result) {
+                $("#status").text("Could not get server time.");
+            });
+        }
+
 
         function getPersons() {
             $.post("/findPerson", { id: document.getElementById("id").value }, function (data, status) {

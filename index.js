@@ -2,6 +2,10 @@ const express = require('express')
 const path = require('path')
 var fs = require('fs')
 
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
+
+
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const PORT = process.env.PORT || 5000
 const connectionString = process.env.DATABASE_URL || "postgres://rwomixvqbgubak:8b23aeaeda698af90a27e3a3d059edc4b3c7325c125705339b722caf7ba15e7d@ec2-54-83-61-142.compute-1.amazonaws.com:5432/d5nbldkuhdg9ue?ssl=true";
@@ -11,6 +15,18 @@ const { Pool } = require('pg')
 const pool = new Pool({connectionString: connectionString});
 
 express()
+  .use(require('morgan')('dev'))
+  .use(session({
+    name: 'server-session-cookie-id',
+    secret: 'shh',
+    saveUninitialized: true,
+    resave: true,
+    store: new FileStore()
+  }))
+  .use(function printSession(req, res, next) {
+    console.log('req.session', req.session);
+    return next();
+  })
   .use(express.urlencoded())
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
@@ -90,10 +106,28 @@ express()
     res.write("<div class='display-4'>The answer is " + answer.toString() + "</div>");
     res.end();
   })
-  .post('/login', function (req, res) {
+  .get('/login', (req, res) => {
+    res.render('pages/test')
+  })
 
+
+  .post('/login', function (req, res) {
+    username = req.body.username;
+    password = req.body.password;
+    console.log("username: ", username, "Password: ", password);
+    if(username == 'admin' && password == 'password') {
+      console.log('success: true');
+      res.json({success: true});
+    } else {
+      console.log('success: false');
+      res.json({success: false});
+    }
   })
-  .post('/logout' function (req, res) {
-    
+
+
+  .post('/logout', function (req, res) {
   })
+
+
+
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
