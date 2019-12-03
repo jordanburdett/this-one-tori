@@ -90,4 +90,10 @@ express()
     res.write("<div class='display-4'>The answer is " + answer.toString() + "</div>");
     res.end();
   })
+  .post('/login', function (req, res) {
+
+  })
+  .post('/logout' function (req, res) {
+    
+  })
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
