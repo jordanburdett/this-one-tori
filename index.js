@@ -5,6 +5,24 @@ var fs = require('fs')
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
 
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
+const myPlaintextPassword = 'verytired';
+const someOtherPlaintextPassword = 'not_bacon';
+
+bcrypt.hash(myPlaintextPassword, saltRounds, function(err, hash) {
+  console.log(hash);
+
+  bcrypt.compare(myPlaintextPassword, hash, function(err, res) {
+    if (res) {
+      console.log("equal");
+    }
+  });
+  
+});
+
+
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 const PORT = process.env.PORT || 5000
@@ -13,6 +31,11 @@ console.log("using connection string " + connectionString);
 
 const { Pool } = require('pg')
 const pool = new Pool({connectionString: connectionString});
+
+var logger = function logRequest(req, res, next) {
+  console.log("Received a request for: " + req.url);
+  next();
+}
 
 express()
   .use(require('morgan')('dev'))
@@ -27,6 +50,7 @@ express()
     console.log('req.session', req.session);
     return next();
   })
+  .use(logger)
   .use(express.urlencoded())
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
@@ -106,28 +130,70 @@ express()
     res.write("<div class='display-4'>The answer is " + answer.toString() + "</div>");
     res.end();
   })
-  .get('/login', (req, res) => {
-    res.render('pages/test')
-  })
-
-
   .post('/login', function (req, res) {
     username = req.body.username;
     password = req.body.password;
+    
+    var sql = "SELECT password FROM users where username = '" + username + "'";
+    pool.query(sql, function (err, queryRes) {
+      if(err) {
+        console.log("ERRRROOOOOORRRRR!!!!");
+        console.log(err);
+      }
+      console.log("QUERY!!!!!!");
+      console.log(queryRes.rows);
+
+      var hash = queryRes.rows[0].password;
+      console.log("PASSWORD: " + password);
+      console.log("HASH: " + hash);
+
+      bcrypt.compare(password, hash, (err, same) => {
+        console.log(same);
+        if (same) {
+          console.log("They are the same...");
+          req.session.user = username;
+          res.json({success: true});
+        }
+        else {
+          console.log('success: false');
+          res.json({success: false});
+        }
+      })
+    })
+
+    /*
     console.log("username: ", username, "Password: ", password);
     if(username == 'admin' && password == 'password') {
       console.log('success: true');
+      req.session.user = username;
       res.json({success: true});
     } else {
       console.log('success: false');
       res.json({success: false});
     }
+    */
   })
 
 
   .post('/logout', function (req, res) {
+    if (!req.session.user) {
+      console.log('no one to log out');
+      res.json({success: false});
+    } else {
+      req.session.user = null;
+      console.log('logged out');
+      res.json({success: true});
+    }
   })
-
-
-
+  .get('/getServerTime', (function verifyLogin(req, res, next) {
+    if(!req.session.user) {
+      res.status(401).json({success: false, error: 'Not logged in'});
+    }
+    else {
+      next();
+    }
+  }), function (req, res) {
+    var time = new Date();
+    res.json({success: true, time: time});
+  })
   .listen(PORT, () => console.log(`Listening on ${PORT}`))
